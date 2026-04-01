@@ -152,14 +152,18 @@
   .cel-msg {
     font-size: clamp(2rem, 7vw, 3.5rem);
     font-weight: 900;
-    line-height: 1.25;
+    line-height: 1.35;
     max-width: 680px;
     animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-    background: linear-gradient(135deg, #fff 30%, #fde68a);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    filter: drop-shadow(0 2px 24px rgba(0,0,0,0.8));
+    color: #fff;
+    text-shadow:
+      0 0 30px rgba(0,0,0,1),
+      0 0 60px rgba(0,0,0,0.9),
+      0 2px 4px rgba(0,0,0,1);
+    background: rgba(0,0,0,0.45);
+    padding: 20px 36px;
+    border-radius: 20px;
+    backdrop-filter: blur(6px);
   }
 
   /* ── X button — top-right corner, always accessible ── */
