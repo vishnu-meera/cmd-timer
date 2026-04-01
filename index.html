@@ -16,9 +16,10 @@
     align-items: center;
     justify-content: center;
     padding: 16px;
-    overflow-x: hidden;
+    overflow: hidden;
   }
 
+  /* ── Setup card ── */
   .card {
     background: #1a1d2e;
     border-radius: 24px;
@@ -32,9 +33,7 @@
 
   h1 { font-size: clamp(1.6rem, 5vw, 2.1rem); font-weight: 800; line-height: 1.2; margin-bottom: 8px; }
   .subtitle { color: #9ca3b8; font-size: 0.9rem; margin-bottom: 28px; line-height: 1.5; }
-
   label { display: block; font-size: 0.85rem; color: #9ca3b8; margin-bottom: 8px; }
-
   .field { margin-bottom: 18px; }
 
   input[type="datetime-local"],
@@ -52,70 +51,77 @@
   }
   input[type="datetime-local"]:focus,
   input[type="text"]:focus { border-color: #f97316; }
-
   input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-    filter: invert(1);
-    cursor: pointer;
-    opacity: 0.6;
+    filter: invert(1); cursor: pointer; opacity: 0.6;
   }
 
-  .buttons { display: flex; gap: 12px; margin-bottom: 28px; }
-
   .btn-start {
-    flex: 1;
+    width: 100%;
     background: linear-gradient(135deg, #f97316, #ec4899);
     border: none;
     border-radius: 50px;
     color: #fff;
     font-size: 1rem;
     font-weight: 700;
-    padding: 14px 20px;
+    padding: 15px 20px;
     cursor: pointer;
     transition: opacity 0.2s, transform 0.1s;
   }
   .btn-start:hover { opacity: 0.9; }
   .btn-start:active { transform: scale(0.97); }
 
-  .btn-reset {
-    background: #2a2d3e;
-    border: none;
-    border-radius: 50px;
-    color: #fff;
-    font-size: 1rem;
-    font-weight: 700;
-    padding: 14px 24px;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
+  .status-msg {
+    text-align: center;
+    font-size: 0.82rem;
+    min-height: 1.2em;
+    color: #ef4444;
+    margin-bottom: 10px;
   }
-  .btn-reset:hover { background: #353848; }
-  .btn-reset:active { transform: scale(0.97); }
+
+  /* ── Running view (counter only, fullscreen) ── */
+  #running-view {
+    display: none;
+    position: fixed;
+    inset: 0;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+  }
+  #running-view.visible { display: flex; }
 
   .timer-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    margin-bottom: 24px;
+    gap: 14px;
+    width: min(92vw, 500px);
   }
 
   .unit {
-    background: #12151f;
-    border-radius: 16px;
-    padding: 16px 8px 12px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 24px 8px 18px;
     text-align: center;
+    backdrop-filter: blur(8px);
   }
   .unit-num {
-    font-size: clamp(1.6rem, 5vw, 2.2rem);
-    font-weight: 800;
+    font-size: clamp(2rem, 10vw, 3.5rem);
+    font-weight: 900;
     line-height: 1;
     display: block;
     font-variant-numeric: tabular-nums;
     letter-spacing: -0.02em;
   }
-  .unit-label { font-size: 0.7rem; color: #9ca3b8; margin-top: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .unit-label {
+    font-size: 0.68rem;
+    color: #9ca3b8;
+    margin-top: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+  }
 
-  .tip { text-align: center; font-size: 0.78rem; color: #5a5f7a; line-height: 1.5; }
-
-  /* Canvas overlay for fireworks */
+  /* ── Canvas ── */
   #fw-canvas {
     position: fixed;
     inset: 0;
@@ -126,7 +132,7 @@
     display: none;
   }
 
-  /* Celebration overlay */
+  /* ── Celebration message (no overlay bg, floats over fireworks) ── */
   #celebration {
     position: fixed;
     inset: 0;
@@ -135,78 +141,71 @@
     align-items: center;
     justify-content: center;
     z-index: 20;
-    background: rgba(0,0,0,0.55);
+    pointer-events: none;
     padding: 24px;
     text-align: center;
   }
   #celebration.visible { display: flex; }
 
   .cel-msg {
-    font-size: clamp(1.8rem, 6vw, 3rem);
+    font-size: clamp(2rem, 7vw, 3.5rem);
     font-weight: 900;
-    line-height: 1.2;
-    max-width: 600px;
-    animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-    text-shadow: 0 2px 20px rgba(0,0,0,0.6);
+    line-height: 1.25;
+    max-width: 680px;
+    animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
     background: linear-gradient(135deg, #fff 30%, #fde68a);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    filter: drop-shadow(0 2px 24px rgba(0,0,0,0.8));
   }
 
-  .cel-sub {
-    margin-top: 16px;
-    font-size: 1rem;
-    color: #d1d5db;
-    animation: fadeUp 0.6s 0.3s ease both;
-  }
-
-  .btn-close-cel {
-    margin-top: 32px;
-    background: rgba(255,255,255,0.15);
-    border: 1.5px solid rgba(255,255,255,0.25);
-    border-radius: 50px;
+  /* ── X button — top-right corner, always accessible ── */
+  #btn-close {
+    display: none;
+    position: fixed;
+    top: 18px;
+    right: 18px;
+    z-index: 30;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.12);
+    border: 1.5px solid rgba(255,255,255,0.22);
     color: #fff;
-    font-size: 0.95rem;
-    font-weight: 600;
-    padding: 12px 32px;
+    font-size: 1.2rem;
     cursor: pointer;
-    backdrop-filter: blur(8px);
-    animation: fadeUp 0.6s 0.5s ease both;
-    transition: background 0.2s;
+    backdrop-filter: blur(10px);
+    transition: background 0.2s, transform 0.1s;
+    align-items: center;
+    justify-content: center;
   }
-  .btn-close-cel:hover { background: rgba(255,255,255,0.25); }
+  #btn-close.visible { display: flex; }
+  #btn-close:hover { background: rgba(255,255,255,0.25); }
+  #btn-close:active { transform: scale(0.92); }
 
   @keyframes popIn {
-    from { opacity: 0; transform: scale(0.5); }
+    from { opacity: 0; transform: scale(0.4); }
     to   { opacity: 1; transform: scale(1); }
   }
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(16px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
 
-  .status-msg {
-    text-align: center;
-    font-size: 0.82rem;
-    min-height: 1.2em;
-    color: #ef4444;
-    margin-bottom: 12px;
-    margin-top: -12px;
-  }
+  .tip { text-align: center; font-size: 0.78rem; color: #5a5f7a; line-height: 1.5; margin-top: 20px; }
 </style>
 </head>
 <body>
 
 <canvas id="fw-canvas"></canvas>
 
+<!-- X close button — top right, visible during running & celebration -->
+<button id="btn-close" onclick="resetAll()" title="Reset">✕</button>
+
+<!-- Celebration message floats over fireworks -->
 <div id="celebration">
   <div class="cel-msg" id="cel-text"></div>
-  <div class="cel-sub">The countdown is complete!</div>
-  <button class="btn-close-cel" onclick="closeCelebration()">Close</button>
 </div>
 
-<div class="card">
+<!-- Setup view -->
+<div class="card" id="setup-view">
   <h1>Countdown +<br>Fireworks</h1>
   <p class="subtitle">Pick a time, add your message, and let the app do the dramatic movie ending.</p>
 
@@ -222,30 +221,34 @@
 
   <div class="status-msg" id="status-msg"></div>
 
-  <div class="buttons">
-    <button class="btn-start" id="btn-start" onclick="startTimer()">Start countdown</button>
-    <button class="btn-reset" onclick="resetTimer()">Reset</button>
-  </div>
+  <button class="btn-start" onclick="startTimer()">Start countdown</button>
 
+  <p class="tip">Tip: standalone file — works offline in Safari/Chrome too.</p>
+</div>
+
+<!-- Running view: counter only -->
+<div id="running-view">
   <div class="timer-grid">
     <div class="unit"><span class="unit-num" id="d">00</span><div class="unit-label">Days</div></div>
     <div class="unit"><span class="unit-num" id="h">00</span><div class="unit-label">Hours</div></div>
     <div class="unit"><span class="unit-num" id="m">00</span><div class="unit-label">Minutes</div></div>
     <div class="unit"><span class="unit-num" id="s">00</span><div class="unit-label">Seconds</div></div>
   </div>
-
-  <p class="tip">Tip: this file is standalone. Open it in Safari/Chrome and it will work offline too.</p>
 </div>
 
 <script>
-// ─── State ───────────────────────────────────────────────────────────────────
 let intervalId = null;
 let fwAnimId   = null;
 let particles  = [];
 
-// ─── Timer ───────────────────────────────────────────────────────────────────
+// ── Helpers ──────────────────────────────────────────────────────────────────
 function pad(n) { return String(Math.floor(n)).padStart(2, '0'); }
 
+function show(id)  { document.getElementById(id).classList.add('visible'); }
+function hide(id)  { document.getElementById(id).classList.remove('visible'); }
+function setVis(el, v) { document.getElementById(el).style.display = v ? '' : 'none'; }
+
+// ── Timer ────────────────────────────────────────────────────────────────────
 function startTimer() {
   const dtVal  = document.getElementById('target-dt').value;
   const msgVal = document.getElementById('cel-input').value.trim();
@@ -253,35 +256,35 @@ function startTimer() {
 
   if (!dtVal) { status.textContent = 'Please pick a target date and time.'; return; }
   const target = new Date(dtVal).getTime();
-  if (isNaN(target)) { status.textContent = 'Invalid date.'; return; }
+  if (isNaN(target))      { status.textContent = 'Invalid date.'; return; }
   if (target <= Date.now()) { status.textContent = 'Target time must be in the future.'; return; }
   status.textContent = '';
 
-  if (intervalId) clearInterval(intervalId);
+  // Switch views
+  setVis('setup-view', false);
+  show('running-view');
+  show('btn-close');
 
+  if (intervalId) clearInterval(intervalId);
   tick(target, msgVal);
   intervalId = setInterval(() => tick(target, msgVal), 1000);
-
-  document.getElementById('btn-start').textContent = 'Running…';
-  document.getElementById('btn-start').disabled = true;
-  document.getElementById('btn-start').style.opacity = '0.6';
 }
 
 function tick(target, msg) {
   const diff = target - Date.now();
   if (diff <= 0) {
-    clearInterval(intervalId);
-    intervalId = null;
+    clearInterval(intervalId); intervalId = null;
     setDisplay(0, 0, 0, 0);
     triggerCelebration(msg);
     return;
   }
   const totalSec = Math.floor(diff / 1000);
-  const days  = Math.floor(totalSec / 86400);
-  const hours = Math.floor((totalSec % 86400) / 3600);
-  const mins  = Math.floor((totalSec % 3600) / 60);
-  const secs  = totalSec % 60;
-  setDisplay(days, hours, mins, secs);
+  setDisplay(
+    Math.floor(totalSec / 86400),
+    Math.floor((totalSec % 86400) / 3600),
+    Math.floor((totalSec % 3600) / 60),
+    totalSec % 60
+  );
 }
 
 function setDisplay(d, h, m, s) {
@@ -291,37 +294,25 @@ function setDisplay(d, h, m, s) {
   document.getElementById('s').textContent = pad(s);
 }
 
-function resetTimer() {
-  if (intervalId) { clearInterval(intervalId); intervalId = null; }
-  setDisplay(0, 0, 0, 0);
-  document.getElementById('status-msg').textContent = '';
-  document.getElementById('btn-start').textContent = 'Start countdown';
-  document.getElementById('btn-start').disabled = false;
-  document.getElementById('btn-start').style.opacity = '1';
-  closeCelebration();
-}
-
-// ─── Celebration ─────────────────────────────────────────────────────────────
+// ── Celebration ───────────────────────────────────────────────────────────────
 function triggerCelebration(msg) {
-  const cel = document.getElementById('celebration');
-  document.getElementById('cel-text').textContent = msg || '🎉 Time\'s up!';
-  cel.classList.add('visible');
+  hide('running-view');
+  document.getElementById('cel-text').textContent = msg || "🎉 Time's up!";
+  show('celebration');
   startFireworks();
 }
 
-function closeCelebration() {
-  document.getElementById('celebration').classList.remove('visible');
+function resetAll() {
+  if (intervalId) { clearInterval(intervalId); intervalId = null; }
+  hide('celebration');
+  hide('running-view');
+  hide('btn-close');
   stopFireworks();
-  resetTimerDisplay();
+  setDisplay(0, 0, 0, 0);
+  setVis('setup-view', true);
 }
 
-function resetTimerDisplay() {
-  document.getElementById('btn-start').textContent = 'Start countdown';
-  document.getElementById('btn-start').disabled = false;
-  document.getElementById('btn-start').style.opacity = '1';
-}
-
-// ─── Fireworks ────────────────────────────────────────────────────────────────
+// ── Fireworks ─────────────────────────────────────────────────────────────────
 const canvas = document.getElementById('fw-canvas');
 const ctx    = canvas.getContext('2d');
 
@@ -339,24 +330,21 @@ function resizeCanvas() {
 class Particle {
   constructor(x, y, color, type) {
     this.x = x; this.y = y; this.color = color; this.type = type;
+    this.trail = [];
     if (type === 'shell') {
-      // Rising shell
       this.vx = (Math.random() - 0.5) * 2;
       this.vy = -(Math.random() * 12 + 10);
-      this.alpha = 1;
+      this.alpha  = 1;
       this.radius = 3;
-      this.trail = [];
     } else {
-      // Explosion spark
-      const angle  = Math.random() * Math.PI * 2;
-      const speed  = Math.random() * 7 + 1;
-      this.vx = Math.cos(angle) * speed;
-      this.vy = Math.sin(angle) * speed;
+      const angle = Math.random() * Math.PI * 2;
+      const speed = Math.random() * 7 + 1;
+      this.vx     = Math.cos(angle) * speed;
+      this.vy     = Math.sin(angle) * speed;
       this.alpha  = 1;
       this.radius = Math.random() * 2.5 + 1;
       this.decay  = Math.random() * 0.012 + 0.008;
       this.gravity= 0.12;
-      this.trail  = [];
       this.twinkle= Math.random() < 0.3;
     }
   }
@@ -367,7 +355,7 @@ class Particle {
       if (this.trail.length > 8) this.trail.shift();
       this.x  += this.vx;
       this.y  += this.vy;
-      this.vy += 0.25; // gravity on shell
+      this.vy += 0.25;
       this.alpha -= 0.018;
       return this.alpha > 0 && this.y > 0;
     } else {
@@ -377,29 +365,26 @@ class Particle {
       this.y  += this.vy;
       this.vy += this.gravity;
       this.vx *= 0.98;
-      if (this.twinkle) this.alpha -= this.decay * (0.5 + Math.random());
-      else              this.alpha -= this.decay;
+      this.alpha -= this.twinkle ? this.decay * (0.5 + Math.random()) : this.decay;
       return this.alpha > 0;
     }
   }
 
   draw() {
     ctx.save();
-    // Draw trail
     for (let i = 0; i < this.trail.length; i++) {
       const t = this.trail[i];
-      const ratio = i / this.trail.length;
-      ctx.globalAlpha = t.alpha * ratio * 0.4;
+      const r = i / this.trail.length;
+      ctx.globalAlpha = t.alpha * r * 0.4;
       ctx.beginPath();
-      ctx.arc(t.x, t.y, this.radius * ratio, 0, Math.PI * 2);
+      ctx.arc(t.x, t.y, this.radius * r, 0, Math.PI * 2);
       ctx.fillStyle = this.color;
       ctx.fill();
     }
-    // Draw head
     ctx.globalAlpha = this.alpha;
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-    ctx.fillStyle = this.color;
+    ctx.fillStyle   = this.color;
     ctx.shadowBlur  = 8;
     ctx.shadowColor = this.color;
     ctx.fill();
@@ -408,15 +393,13 @@ class Particle {
 }
 
 function explode(x, y) {
-  const color  = COLORS[Math.floor(Math.random() * COLORS.length)];
-  const color2 = COLORS[Math.floor(Math.random() * COLORS.length)];
-  const count  = Math.floor(Math.random() * 60 + 80);
-  for (let i = 0; i < count; i++) {
-    particles.push(new Particle(x, y, i % 3 === 0 ? color2 : color, 'spark'));
-  }
-  // Gold glitter ring
-  const glitter = Math.floor(Math.random() * 20 + 15);
-  for (let i = 0; i < glitter; i++) {
+  const c1 = COLORS[Math.floor(Math.random() * COLORS.length)];
+  const c2 = COLORS[Math.floor(Math.random() * COLORS.length)];
+  const n  = Math.floor(Math.random() * 60 + 80);
+  for (let i = 0; i < n; i++)
+    particles.push(new Particle(x, y, i % 3 === 0 ? c2 : c1, 'spark'));
+  // White glitter
+  for (let i = 0, g = Math.floor(Math.random() * 20 + 15); i < g; i++) {
     const p = new Particle(x, y, '#fff', 'spark');
     p.radius = Math.random() * 1.5 + 0.5;
     p.decay  = 0.015;
@@ -425,53 +408,38 @@ function explode(x, y) {
 }
 
 function launchShell() {
-  const x = Math.random() * canvas.width;
+  const x     = Math.random() * canvas.width;
   const color = COLORS[Math.floor(Math.random() * COLORS.length)];
   const shell = new Particle(x, canvas.height, color, 'shell');
-  const targetY = Math.random() * canvas.height * 0.55 + canvas.height * 0.05;
-
   particles.push(shell);
-
-  // Explode when shell reaches peak (simulate with timeout based on physics)
   const tPeak = Math.abs(shell.vy) / 0.25;
-  const yAtPeak = canvas.height + shell.vy * tPeak + 0.5 * 0.25 * tPeak * tPeak;
-  const peakY = Math.max(targetY, canvas.height * 0.08);
-  const timeMs = tPeak * (1000 / 60);
-
+  const peakY = Math.max(Math.random() * canvas.height * 0.55 + canvas.height * 0.05, canvas.height * 0.08);
   setTimeout(() => {
     explode(shell.x + shell.vx * tPeak, peakY);
-    // Remove shell after it explodes
     const idx = particles.indexOf(shell);
     if (idx !== -1) particles.splice(idx, 1);
-  }, timeMs);
+  }, tPeak * (1000 / 60));
 }
 
-let lastLaunch = 0;
-let launchInterval = 400;
+let lastLaunch = 0, launchInterval = 400;
 
 function fwLoop(ts) {
   fwAnimId = requestAnimationFrame(fwLoop);
-
-  // Fade trail
   ctx.globalCompositeOperation = 'destination-out';
   ctx.fillStyle = 'rgba(0,0,0,0.25)';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.globalCompositeOperation = 'lighter';
 
-  // Auto-launch shells
   if (ts - lastLaunch > launchInterval) {
     launchShell();
-    // Occasionally double-fire
-    if (Math.random() < 0.4) setTimeout(launchShell, 120);
+    if (Math.random() < 0.4)  setTimeout(launchShell, 120);
     if (Math.random() < 0.15) setTimeout(launchShell, 260);
     lastLaunch = ts;
     launchInterval = Math.random() * 300 + 250;
   }
 
-  // Update & draw
   for (let i = particles.length - 1; i >= 0; i--) {
-    const alive = particles[i].update();
-    if (!alive) { particles.splice(i, 1); continue; }
+    if (!particles[i].update()) { particles.splice(i, 1); continue; }
     particles[i].draw();
   }
 }
@@ -480,8 +448,7 @@ function startFireworks() {
   resizeCanvas();
   canvas.style.display = 'block';
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  particles = [];
-  lastLaunch = 0;
+  particles = []; lastLaunch = 0;
   fwAnimId = requestAnimationFrame(fwLoop);
 }
 
@@ -496,12 +463,12 @@ window.addEventListener('resize', () => {
   if (canvas.style.display !== 'none') resizeCanvas();
 });
 
-// Set default datetime to 1 minute from now
-(function() {
+// Default: 1 minute from now
+(function () {
   const dt  = new Date(Date.now() + 60000);
-  const pad = n => String(n).padStart(2, '0');
-  const iso = `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())}T${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
-  document.getElementById('target-dt').value = iso;
+  const p   = n => String(n).padStart(2, '0');
+  document.getElementById('target-dt').value =
+    `${dt.getFullYear()}-${p(dt.getMonth()+1)}-${p(dt.getDate())}T${p(dt.getHours())}:${p(dt.getMinutes())}`;
 })();
 </script>
 </body>
