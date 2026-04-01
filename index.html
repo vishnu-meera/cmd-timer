@@ -123,46 +123,6 @@
     font-weight: 500;
   }
 
-  /* ── Balloons ── */
-  .balloon {
-    position: fixed;
-    bottom: -140px;
-    width: 60px;
-    height: 75px;
-    border-radius: 50%;
-    opacity: 0;
-    z-index: 11;
-    animation: riseUp linear forwards;
-    pointer-events: none;
-  }
-  .balloon::after {
-    content: '';
-    position: absolute;
-    bottom: -18px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 1px;
-    height: 20px;
-    background: rgba(255,255,255,0.5);
-  }
-  .balloon::before {
-    content: '';
-    position: absolute;
-    bottom: -4px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 6px;
-    height: 6px;
-    background: inherit;
-    border-radius: 50%;
-  }
-  @keyframes riseUp {
-    0%   { bottom: -140px; opacity: 0; transform: translateX(0) rotate(-4deg); }
-    8%   { opacity: 0.9; }
-    50%  { transform: translateX(18px) rotate(4deg); }
-    100% { bottom: 110%; opacity: 0.2; transform: translateX(-10px) rotate(-3deg); }
-  }
-
   /* ── Canvas ── */
   #fw-canvas {
     position: fixed;
@@ -342,7 +302,6 @@ function triggerCelebration(msg) {
   document.getElementById('cel-text').textContent = msg || "🎉 Time's up!";
   show('celebration');
   startFireworks();
-  startBalloons();
 }
 
 function resetAll() {
@@ -351,46 +310,8 @@ function resetAll() {
   hide('running-view');
   hide('btn-close');
   stopFireworks();
-  stopBalloons();
   setDisplay(0, 0, 0, 0);
   setVis('setup-view', true);
-}
-
-// ── Balloons ──────────────────────────────────────────────────────────────────
-const BALLOON_COLORS = [
-  '#ff4757','#ffa502','#2ed573','#1e90ff','#eccc68',
-  '#ff6b81','#a29bfe','#fd79a8','#ff6348','#7bed9f',
-];
-let balloonTimer = null;
-let balloonEls   = [];
-
-function spawnBalloon() {
-  const el = document.createElement('div');
-  el.className = 'balloon';
-  el.style.left     = (Math.random() * 92 + 2) + 'vw';
-  el.style.width    = (50 + Math.random() * 30) + 'px';
-  el.style.height   = (62 + Math.random() * 30) + 'px';
-  el.style.background = BALLOON_COLORS[Math.floor(Math.random() * BALLOON_COLORS.length)];
-  const dur = 4 + Math.random() * 5;
-  el.style.animationDuration = dur + 's';
-  el.style.animationDelay    = '0s';
-  document.body.appendChild(el);
-  balloonEls.push(el);
-  setTimeout(() => { el.remove(); balloonEls = balloonEls.filter(b => b !== el); }, dur * 1000 + 200);
-}
-
-function startBalloons() {
-  spawnBalloon();
-  balloonTimer = setInterval(() => {
-    const burst = Math.floor(Math.random() * 2) + 1;
-    for (let i = 0; i < burst; i++) setTimeout(spawnBalloon, i * 180);
-  }, 600);
-}
-
-function stopBalloons() {
-  if (balloonTimer) { clearInterval(balloonTimer); balloonTimer = null; }
-  balloonEls.forEach(el => el.remove());
-  balloonEls = [];
 }
 
 // ── Fireworks ─────────────────────────────────────────────────────────────────
